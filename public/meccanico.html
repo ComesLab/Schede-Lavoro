@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#0c0f14">
+<title>Schede Lavorazione — Marina Rodi</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#0c0f14;--bg-card:#13171e;--bg-surface:#1a1f2a;--bg-hover:#222938;--bg-input:#161b24;--border:#2a3040;--border-focus:#3b82f6;--text:#e2e8f0;--text-dim:#8494a7;--text-muted:#566378;--accent:#3b82f6;--accent-dim:#1e3a5f;--success:#22c55e;--success-dim:#0d3320;--warning:#f59e0b;--warning-dim:#3d2800;--danger:#ef4444;--danger-dim:#3d1010;--radius:8px;--radius-sm:5px;--radius-lg:12px;--font:'DM Sans',system-ui,sans-serif;--mono:'JetBrains Mono','Consolas',monospace}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{font-size:14px;overflow-x:hidden}
+body{font-family:var(--font);background:var(--bg);color:var(--text);line-height:1.5;min-height:100dvh;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+.container{max-width:900px;margin:0 auto;padding:0 16px 40px;width:100%;overflow-x:hidden}
+
+/* Header */
+.header{display:flex;align-items:center;justify-content:space-between;padding:16px 0;border-bottom:1px solid var(--border);margin-bottom:16px;flex-wrap:wrap;gap:10px}
+.header-left{display:flex;align-items:center;gap:12px}
+.logo{width:44px;height:44px;border-radius:var(--radius-lg);object-fit:contain;flex-shrink:0}
+.header h1{font-size:1.25rem;font-weight:700}
+.header .sub{font-size:.78rem;color:var(--text-dim);margin-top:2px}
+.header-actions{display:flex;gap:8px;flex-wrap:wrap}
+
+/* Buttons */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:8px 16px;border:1px solid transparent;border-radius:var(--radius);font:500 .85rem var(--font);cursor:pointer;transition:all .15s;text-decoration:none}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}.btn-primary:hover{background:#2563eb}
+.btn-ghost{background:transparent;color:var(--text-dim);border-color:var(--border)}.btn-ghost:hover{background:var(--bg-surface);color:var(--text)}
+.btn-danger{background:var(--danger);color:#fff}.btn-danger:hover{background:#dc2626}
+.btn-success{background:var(--success);color:#fff}.btn-success:hover{background:#16a34a}
+.btn-warning{background:var(--warning);color:#000}.btn-warning:hover{background:#d97706}
+.btn-sm{padding:6px 12px;font-size:.78rem}
+.btn-back{background:var(--accent-dim);color:var(--accent);border:none;padding:12px 22px;font-size:.92rem;font-weight:600;border-radius:var(--radius);gap:8px;min-height:44px}.btn-back:hover{background:#243f6a;color:#60a5fa}.btn-back svg{flex-shrink:0}
+
+/* Filter tabs */
+.filters{display:flex;gap:4px;margin-bottom:14px;flex-wrap:wrap}
+.filter-btn{padding:6px 14px;border:1px solid var(--border);background:transparent;color:var(--text-dim);border-radius:20px;font:500 .78rem var(--font);cursor:pointer;transition:all .15s}
+.filter-btn:hover{background:var(--bg-surface);color:var(--text)}
+.filter-btn.active{background:var(--accent-dim);color:var(--accent);border-color:var(--accent)}
+.search-bar{margin-bottom:14px}
+.search-bar input{width:100%;padding:10px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:.88rem var(--font)}
+.search-bar input:focus{outline:none;border-color:var(--border-focus)}
+.search-bar input::placeholder{color:var(--text-muted)}
+
+/* Cards grid */
+.schede-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:12px}
+.scheda-card{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);padding:14px;cursor:pointer;transition:border-color .2s,transform .15s;overflow:hidden;min-width:0}
+.scheda-card:hover{border-color:var(--accent);transform:translateY(-2px)}
+.card-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px;gap:8px;min-width:0}
+.card-barca{font-size:1rem;font-weight:700;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0;flex:1}
+.badge{display:inline-block;padding:2px 10px;border-radius:20px;font-size:.7rem;font-weight:600;text-transform:uppercase;letter-spacing:.04em;flex-shrink:0;white-space:nowrap}
+.badge-aperta{background:var(--warning-dim);color:var(--warning)}
+.badge-completata{background:var(--success-dim);color:var(--success)}
+.badge-archiviata{background:var(--bg-hover);color:var(--text-muted)}
+.card-meta{font-size:.78rem;color:var(--text-dim);display:flex;gap:10px;flex-wrap:wrap;margin-bottom:6px}
+.card-meccanico{font-size:.92rem;font-weight:600;color:var(--text);margin-bottom:5px;display:flex;align-items:center;gap:5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-desc{font-size:.82rem;color:var(--text-dim);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.card-tags{display:flex;flex-wrap:wrap;gap:3px;margin-bottom:8px}
+.card-tag{padding:2px 7px;font-size:.68rem;background:var(--accent-dim);color:var(--accent);border-radius:10px;font-weight:500}
+.card-thumbs{display:flex;gap:4px}
+.card-thumb{width:48px;height:48px;border-radius:var(--radius-sm);object-fit:cover;border:1px solid var(--border)}
+
+/* Detail view */
+.detail-section{margin-bottom:20px}
+.detail-hero{background:var(--bg-card);padding:14px 16px;border-radius:var(--radius-lg);border-bottom:2px solid var(--accent);margin-bottom:16px}
+.detail-hero-top{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+.detail-hero-boat{font-size:1.35rem;font-weight:700}
+.detail-hero-id{font-size:.78rem;color:var(--text-muted);font-family:var(--mono);margin-top:2px}
+.detail-chunk-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:18px}
+.detail-chunk{background:var(--bg-card);border-radius:var(--radius);padding:10px 14px}
+.detail-chunk-lbl{font-size:.78rem;color:var(--text-dim);margin-bottom:3px;display:flex;align-items:center;gap:5px}
+.detail-chunk-val{font-size:.95rem;font-weight:600;overflow-wrap:break-word;word-break:break-word}
+.detail-section-hdr{display:flex;align-items:center;gap:6px;font-size:.82rem;color:var(--accent);font-weight:600;text-transform:uppercase;letter-spacing:.04em;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:10px}
+.detail-desc-box{background:var(--bg-card);border-left:3px solid var(--accent);padding:12px 14px;border-radius:0 var(--radius) var(--radius) 0;font-size:.95rem;line-height:1.6}
+.form-section-hdr{display:flex;align-items:center;gap:8px;font-size:.85rem;color:var(--accent);font-weight:600;padding:10px 0 8px;border-bottom:1px solid var(--border);margin:20px 0 14px;text-transform:uppercase;letter-spacing:.04em}
+.foto-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:8px}
+.foto-grid img{width:100%;aspect-ratio:1;object-fit:cover;border-radius:var(--radius);border:1px solid var(--border);cursor:pointer;transition:transform .15s}
+.foto-grid img:hover{transform:scale(1.03)}
+.ricambi-table{width:100%;border-collapse:collapse;font-size:.85rem;table-layout:fixed}
+.ricambi-table th{text-align:left;padding:6px 10px;background:var(--bg-surface);color:var(--text-dim);font-size:.72rem;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border)}
+.ricambi-table td{padding:6px 10px;border-bottom:1px solid var(--border);word-break:break-word;overflow-wrap:break-word}
+.actions-bar{display:flex;gap:8px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+
+/* Edit panel */
+.edit-panel{margin-top:16px;padding:16px;background:var(--bg-surface);border:1px solid var(--border);border-radius:var(--radius-lg)}
+.edit-panel h3{font-size:.88rem;font-weight:600;margin-bottom:12px;color:var(--accent)}
+.edit-group{margin-bottom:14px}
+.edit-group label{display:block;font-size:.82rem;font-weight:600;color:var(--text-dim);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px}
+.edit-group input,.edit-group textarea{width:100%;padding:10px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:.88rem var(--font)}
+.edit-group input:focus,.edit-group textarea:focus{outline:none;border-color:var(--border-focus)}
+.edit-group textarea{resize:vertical;min-height:70px}
+
+/* Ricambi search in edit/create */
+.ric-search-wrap{position:relative}
+.ric-results{position:absolute;top:100%;left:0;right:0;background:var(--bg-surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);max-height:200px;overflow-y:auto;z-index:10;display:none}
+.ric-results.show{display:block}
+.ric-result{padding:10px 14px;cursor:pointer;border-bottom:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;font-size:.85rem}
+.ric-result:hover{background:var(--bg-hover)}
+.ric-code{font-family:var(--mono);font-size:.78rem;color:var(--accent);font-weight:500}
+.ric-desc{flex:1;padding:0 8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.stock-ok{color:var(--success);font-family:var(--mono);font-size:.75rem}
+.stock-low{color:var(--danger);font-family:var(--mono);font-size:.75rem}
+.stock-zero{color:var(--text-muted);font-family:var(--mono);font-size:.75rem}
+
+/* Selected ricambi list */
+.ric-item{display:flex;align-items:center;gap:8px;padding:8px 10px;margin-bottom:4px;background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);animation:tagIn .2s ease}
+@keyframes tagIn{from{transform:scale(.95);opacity:0}}
+.ric-item-info{flex:1;min-width:0}
+.ric-item-code{font-family:var(--mono);font-size:.72rem;color:var(--accent);font-weight:500}
+.ric-item-desc{font-size:.82rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.qty-ctrl{display:flex;align-items:center;border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;flex-shrink:0}
+.qty-ctrl button{width:28px;height:28px;background:var(--bg-input);border:none;color:var(--text-dim);font-size:1rem;cursor:pointer}
+.qty-ctrl button:hover{background:var(--bg-hover);color:var(--text)}
+.qty-ctrl span{width:30px;text-align:center;font-family:var(--mono);font-size:.85rem;font-weight:600;background:var(--bg-card);line-height:28px}
+.ric-remove{width:24px;height:24px;display:grid;place-items:center;background:none;border:none;color:var(--text-muted);cursor:pointer;font-size:.9rem;border-radius:var(--radius-sm);flex-shrink:0}
+.ric-remove:hover{background:var(--danger-dim);color:var(--danger)}
+.ric-manual-row{display:flex;gap:8px;margin-top:8px}
+.ric-manual-row input{flex:1;padding:10px 14px;background:var(--bg-input);border:1px solid var(--border);border-radius:var(--radius);color:var(--text);font:.85rem var(--font)}
+.ric-manual-row input:focus{outline:none;border-color:var(--border-focus)}
+.divider{display:flex;align-items:center;gap:10px;margin:10px 0;font-size:.72rem;color:var(--text-muted)}
+.divider::before,.divider::after{content:'';flex:1;height:1px;background:var(--border)}
+
+/* Photo upload */
+.foto-upload-grid{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.foto-preview{width:64px;height:64px;border-radius:var(--radius-sm);object-fit:cover;border:1px solid var(--success);position:relative}
+.foto-preview-wrap{position:relative;display:inline-block}
+.foto-preview-rm{position:absolute;top:-4px;right:-4px;width:18px;height:18px;background:var(--danger);color:#fff;border:none;border-radius:50%;font-size:10px;cursor:pointer;display:grid;place-items:center}
+
+/* Progress + Toast */
+.progress{width:100%;height:4px;background:var(--bg-surface);border-radius:2px;overflow:hidden;margin:10px 0;display:none}
+.progress.active{display:block}
+.progress-fill{height:100%;background:var(--accent);width:0;transition:width .3s}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(100px);background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius);padding:14px 20px;font-size:.88rem;font-weight:500;box-shadow:0 8px 32px rgba(0,0,0,.5);z-index:100;transition:transform .3s;max-width:90vw;text-align:center}
+.toast.show{transform:translateX(-50%) translateY(0)}
+.toast.success{border-color:var(--success);color:var(--success)}
+.toast.error{border-color:var(--danger);color:var(--danger)}
+
+/* Empty state */
+.empty{text-align:center;padding:60px 20px;color:var(--text-muted)}
+.empty-icon{font-size:3rem;margin-bottom:12px;opacity:.5}
+
+/* Hide/show views */
+.view{display:none}.view.active{display:block}
+
+/* Success screen */
+.success-screen{text-align:center;padding:40px 20px}
+.success-icon{width:80px;height:80px;background:var(--success-dim);border-radius:50%;display:grid;place-items:center;margin:0 auto 20px;font-size:2.5rem;animation:popIn .4s cubic-bezier(.175,.885,.32,1.275)}
+@keyframes popIn{from{transform:scale(0)}}
+
+/* App credit inline nell'header — default nascosto, visibile su mobile via media query */
+.header-credit{display:none;font-size:.63rem;color:var(--text-muted);margin-top:3px;letter-spacing:.02em;opacity:.55}
+.header-credit span{color:var(--accent);font-weight:500}
+
+/* Foto source sheet (replica action sheet iOS su Android/desktop) */
+.sheet-overlay{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:90;display:none;align-items:flex-end;justify-content:center;padding:12px}
+.sheet-overlay.show{display:flex}
+.sheet{width:100%;max-width:480px;animation:sheetUp .2s ease}
+@keyframes sheetUp{from{transform:translateY(24px);opacity:0}}
+.sheet-group{background:var(--bg-card);border:1px solid var(--border);border-radius:var(--radius-lg);overflow:hidden;margin-bottom:8px}
+.sheet-title{padding:10px 16px;font-size:.72rem;font-weight:600;color:var(--text-muted);text-transform:uppercase;letter-spacing:.04em;text-align:center;border-bottom:1px solid var(--border)}
+.sheet-btn{display:flex;align-items:center;gap:12px;width:100%;min-height:48px;padding:12px 16px;background:transparent;border:none;border-bottom:1px solid var(--border);color:var(--text);font:500 .95rem var(--font);cursor:pointer;text-align:left}
+.sheet-btn:last-child{border-bottom:none}
+.sheet-btn:hover,.sheet-btn:focus-visible{background:var(--bg-hover);outline:none}
+.sheet-btn svg{flex-shrink:0;color:var(--accent)}
+.sheet-cancel{justify-content:center;color:var(--danger);font-weight:600}
+
+/* Responsive */
+@media(max-width:480px){
+  .schede-grid{grid-template-columns:minmax(0,1fr)}
+  .detail-chunk-grid{grid-template-columns:minmax(0,1fr) minmax(0,1fr)}
+  /* Header: rimane in riga (default flex-direction:row + flex-wrap:wrap dal base).
+     Se non c'è spazio, il bottone va a capo ma NON diventa full-width. */
+  .header-left{min-width:0;flex:1 1 0%}
+  .header-left>div{min-width:0}
+  .header h1{font-size:1.05rem;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .header-actions{flex-shrink:0}
+  .header-actions .btn-primary{padding:8px 10px;font-size:.8rem;white-space:nowrap}
+  /* Credit: visibile nell'header su mobile, nascosto in fondo */
+  .header-credit{display:block}
+  .app-credit{display:none}
+  .actions-bar{flex-direction:column}
+  .actions-bar .btn{width:100%;justify-content:center}
+  /* Thumbnails foto non devono sfondare il viewport */
+  .card-thumbs{flex-wrap:wrap}
+}
+
+/* Scrollbar */
+::-webkit-scrollbar{width:5px;height:5px}::-webkit-scrollbar-track{background:transparent}::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* App credit footer (desktop) */
+.app-credit{text-align:center;padding:32px 16px 8px;font-size:.68rem;color:var(--text-muted);letter-spacing:.03em;opacity:.55;transition:opacity .2s}
+.app-credit:hover{opacity:.85}
+.app-credit span{color:var(--accent);font-weight:500}
+</style>
+</head>
+<body>
+<div class="container">
+    <!-- Header (sempre visibile) -->
+    <header class="header">
+        <div class="header-left">
+            <img src="/logoporto.jpg" class="logo" alt="Marina Rodi Garganico">
+            <div>
+                <h1>Schede Lavorazione</h1>
+                <p class="sub">Marina Rodi Garganico</p>
+                <p class="header-credit">Built by <span>A. Comes</span> · AI assisted</p>
+            </div>
+        </div>
+        <div class="header-actions" id="header-actions">
+            <button class="btn btn-primary" onclick="showView('create')">+ Nuova Scheda</button>
+        </div>
+    </header>
+
+    <!-- Demo Banner -->
+    <div id="demo-banner-mec" style="background:linear-gradient(135deg,#1e3a5f,#3b82f6);padding:12px 20px;border-radius:8px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.2rem">🧪</span>
+            <div>
+                <div style="font-weight:700;font-size:.92rem;color:#fff">DEMO MODE</div>
+                <div style="font-size:.75rem;color:#93c5fd">Dati fittizi — reset automatico ogni 10 minuti</div>
+            </div>
+        </div>
+        <div style="background:rgba(0,0,0,.3);padding:6px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:#93c5fd">
+            Reset tra <span id="demo-countdown-mec" style="color:#fff;font-weight:700">--:--</span>
+        </div>
+    </div>
+
+    <!-- ═══ VIEW: LISTA SCHEDE ═══ -->
+    <div class="view active" id="view-list">
+        <div class="filters" id="filters">
+            <button class="filter-btn active" onclick="filterSchede('TUTTE',this)">Tutte</button>
+            <button class="filter-btn" onclick="filterSchede('APERTA',this)">🟡 Aperte</button>
+            <button class="filter-btn" onclick="filterSchede('COMPLETATA',this)">🟢 Completate</button>
+            <button class="filter-btn" onclick="filterSchede('ARCHIVIATA',this)">⚫ Archiviate</button>
+        </div>
+        <div class="search-bar">
+            <input type="text" id="search-barca" placeholder="Cerca per nome barca..." oninput="applyFilters()">
+        </div>
+        <div id="schede-container"></div>
+    </div>
+
+    <!-- ═══ VIEW: DETTAGLIO/MODIFICA SCHEDA ═══ -->
+    <div class="view" id="view-detail">
+        <button class="btn btn-back" onclick="showView('list')" style="margin-bottom:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Torna alla lista</button>
+        <div id="detail-content"></div>
+    </div>
+
+    <!-- ═══ VIEW: CREA NUOVA SCHEDA ═══ -->
+    <div class="view" id="view-create">
+        <button class="btn btn-back" onclick="showView('list')" style="margin-bottom:14px"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Torna alla lista</button>
+        <div id="create-form"></div>
+    </div>
+</div>
+<footer class="app-credit">Built by <span>A. Comes</span> · AI assisted</footer>
+<div class="toast" id="toast"></div>
+<div class="sheet-overlay" id="foto-sheet" role="dialog" aria-modal="true" aria-labelledby="foto-sheet-title" onclick="if(event.target===this)closeFotoSheet()">
+    <div class="sheet">
+        <div class="sheet-group">
+            <div class="sheet-title" id="foto-sheet-title">Aggiungi foto</div>
+            <button class="sheet-btn" onclick="pickFotoSource('camera')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>Scatta foto</button>
+            <button class="sheet-btn" onclick="pickFotoSource('library')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><path d="M21 15l-5-5L5 21"/></svg>Libreria foto</button>
+            <button class="sheet-btn" onclick="pickFotoSource('file')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Scegli file</button>
+        </div>
+        <div class="sheet-group"><button class="sheet-btn sheet-cancel" onclick="closeFotoSheet()">Annulla</button></div>
+    </div>
+</div>
+
+<script>
+'use strict';
+
+const API = `${location.origin}/api`;
+let allSchede = [];
+let partsCache = [];
+let currentFilter = 'TUTTE';
+
+// ═══════════════════════════════════════════
+//  STATE per creazione/modifica
+// ═══════════════════════════════════════════
+let newRicambi = [];   // { codice, descrizione, quantita, tipo, giacenza }
+// Esponi per il pannello Vision
+window.partsCache = partsCache;
+window.newRicambi = newRicambi;
+let newFotos = [];     // { base64, preview, mimeType, label }
+let existingFotos = [];  // { url, thumb } — foto già presenti nella scheda
+let removedFotoUrls = []; // URL delle foto esistenti marcate per eliminazione
+let _editHadExistingRicambi = false; // true se la scheda in modifica aveva ricambi
+let searchTimer = null;
+
+// ═══════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadPartsCache();
+    await loadSchede();
+});
+
+async function fetchApi(path, opts = {}) {
+    const res = await fetch(`${API}${path}`, {
+        headers: { 'Content-Type': 'application/json' }, ...opts,
+        body: opts.body ? JSON.stringify(opts.body) : undefined,
+    });
+    if (!res.ok) { const e = await res.json().catch(() => ({ error: res.statusText })); throw new Error(e.error || 'Errore'); }
+    return res.json();
+}
+
+async function loadPartsCache() {
+    try { partsCache = await fetchApi('/parts'); window.partsCache = partsCache; } catch (_) { partsCache = []; }
+}
+
+async function loadSchede() {
+    try {
+        allSchede = await fetchApi('/schede');
+        applyFilters();
+    } catch (e) { document.getElementById('schede-container').innerHTML = `<div class="empty"><p>Errore: ${esc(e.message)}</p></div>`; }
+}
+
+// ═══════════════════════════════════════════
+//  VIEW NAVIGATION
+// ═══════════════════════════════════════════
+function showView(name) {
+    document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+    document.getElementById(`view-${name}`).classList.add('active');
+    if (name === 'list') { loadSchede(); }
+    if (name === 'create') { initCreateForm(); }
+    // Scroll to top
+    window.scrollTo(0, 0);
+}
+
+// ═══════════════════════════════════════════
+//  LISTA SCHEDE
+// ═══════════════════════════════════════════
+function filterSchede(stato, btn) {
+    currentFilter = stato;
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    if (btn) btn.classList.add('active');
+    applyFilters();
+}
+
+function applyFilters() {
+    const q = (document.getElementById('search-barca').value || '').toLowerCase().trim();
+    let filtered = allSchede;
+    if (currentFilter !== 'TUTTE') filtered = filtered.filter(s => s.Stato === currentFilter);
+    if (q) filtered = filtered.filter(s => (s.Barca||'').toLowerCase().includes(q) || (s.Meccanico||'').toLowerCase().includes(q));
+    renderList(filtered);
+}
+
+function renderList(schede) {
+    const c = document.getElementById('schede-container');
+    if (!schede.length) {
+        c.innerHTML = `<div class="empty"><div class="empty-icon">🔧</div><p>Nessuna scheda trovata</p></div>`;
+        return;
+    }
+    c.innerHTML = `<div class="schede-grid">${schede.map(s => {
+        const thumbs = (s.FotoThumbs||'').split(' | ').filter(Boolean);
+        const ricambi = (s.Ricambi||'').split(' | ').filter(Boolean);
+        const bc = s.Stato==='COMPLETATA'?'badge-completata':s.Stato==='ARCHIVIATA'?'badge-archiviata':'badge-aperta';
+        return `<div class="scheda-card" onclick="openDetail('${esc(s.ID)}')">
+            <div class="card-header"><span class="card-barca">⚓ ${esc(s.Barca||'—')}</span><span class="badge ${bc}">${esc(s.Stato||'APERTA')}</span></div>
+            <div class="card-meccanico">👤 ${esc(s.Meccanico||'—')}</div>
+            <div class="card-meta"><span>📅 ${esc(s.Data||'—')}</span>${thumbs.length?`<span>📷 ${thumbs.length}</span>`:''}</div>
+            ${s.Descrizione?`<div class="card-desc">${esc(s.Descrizione)}</div>`:''}
+            ${ricambi.length?`<div class="card-tags">${ricambi.slice(0,4).map(r=>`<span class="card-tag">${esc(r.length>30?r.substring(0,30)+'…':r)}</span>`).join('')}${ricambi.length>4?`<span class="card-tag">+${ricambi.length-4}</span>`:''}</div>`:''}
+            ${thumbs.length?`<div class="card-thumbs">${thumbs.slice(0,4).map(t=>`<img class="card-thumb" src="${esc(t)}" loading="lazy" onerror="this.style.display='none'">`).join('')}</div>`:''}
+        </div>`;
+    }).join('')}</div>`;
+}
+
+// ═══════════════════════════════════════════
+//  DETTAGLIO SCHEDA
+// ═══════════════════════════════════════════
+function openDetail(id) {
+    const s = allSchede.find(x => x.ID === id);
+    if (!s) return;
+    const c = document.getElementById('detail-content');
+    const ricambi = (s.Ricambi||'').split(' | ').filter(Boolean);
+    const thumbs = (s.FotoThumbs||'').split(' | ').filter(Boolean);
+    const urls = (s.FotoURLs||'').split(' | ').filter(Boolean);
+    const isEditable = s.Stato !== 'ARCHIVIATA';
+    const bc = s.Stato==='COMPLETATA'?'badge-completata':s.Stato==='ARCHIVIATA'?'badge-archiviata':'badge-aperta';
+
+    c.innerHTML = `
+        <div class="detail-hero"><div class="detail-hero-top">
+            <div><div class="detail-hero-boat">⚓ ${esc(s.Barca)}</div><div class="detail-hero-id">${esc(s.ID)}</div></div>
+            <span class="badge ${bc}">${esc(s.Stato)}</span>
+        </div></div>
+        <div class="detail-chunk-grid">
+            <div class="detail-chunk"><div class="detail-chunk-lbl">👤 Responsabile lavoro</div><div class="detail-chunk-val">${esc(s.Meccanico||'—')}</div></div>
+            <div class="detail-chunk"><div class="detail-chunk-lbl">📅 Data</div><div class="detail-chunk-val">${esc(s.Data)}</div></div>
+        </div>
+        ${s.Descrizione?`<div class="detail-section"><div class="detail-section-hdr">✏️ Descrizione lavoro</div><div class="detail-desc-box">${esc(s.Descrizione)}</div></div>`:''}
+        ${ricambi.length?`<div class="detail-section"><div class="detail-section-hdr">⚙️ Ricambi (${ricambi.length})</div>
+            <table class="ricambi-table"><thead><tr><th>Codice</th><th>Qtà</th><th>Descrizione</th></tr></thead><tbody>
+            ${ricambi.map(r => { const m=r.match(/^([^×]+)×(\d+)\s*(.*)$/); return m?`<tr><td style="font-family:var(--mono);color:var(--accent);font-size:.82rem">${esc(m[1])}</td><td style="text-align:center">${m[2]}</td><td>${esc(m[3])}</td></tr>`:`<tr><td>—</td><td>1</td><td>${esc(r)}</td></tr>`; }).join('')}
+            </tbody></table></div>`:''}
+        ${thumbs.length?`<div class="detail-section"><div class="detail-section-hdr">📷 Foto (${thumbs.length})</div>
+            <div class="foto-grid">${thumbs.map((t,i)=>`<a href="${esc(urls[i]||t)}" target="_blank"><img src="${esc(t)}" loading="lazy" onerror="this.parentElement.style.display='none'"></a>`).join('')}</div></div>`:''}
+        <div class="actions-bar">
+            <button class="btn btn-ghost" onclick="printScheda('${esc(s.ID)}')">🖨 Stampa PDF</button>
+            ${isEditable?`<button class="btn btn-ghost" onclick="toggleEdit('${esc(s.ID)}')">✏️ Modifica</button>`:''}
+            ${s.Stato==='APERTA'?`<button class="btn btn-success" onclick="changeStato('${esc(s.ID)}','COMPLETATA')">✅ Completa</button>`:''}
+            ${s.Stato==='COMPLETATA'?`<button class="btn btn-ghost" onclick="changeStato('${esc(s.ID)}','APERTA')">↩ Riapri</button><button class="btn btn-warning" onclick="changeStato('${esc(s.ID)}','ARCHIVIATA')">📁 Archivia</button>`:''}
+            ${s.Stato==='ARCHIVIATA'?`<button class="btn btn-ghost" onclick="changeStato('${esc(s.ID)}','APERTA')">↩ Riapri</button>`:''}
+        </div>
+        <div id="edit-panel-wrap"></div>
+    `;
+    showView('detail');
+}
+
+function printScheda(id) { window.open(`${API}/schede/${id}/print`, '_blank'); }
+
+async function changeStato(id, stato) {
+    try {
+        await fetchApi(`/schede/${id}`, { method: 'PATCH', body: { stato } });
+        toast(`Scheda ${id} → ${stato}`, 'success');
+        await loadSchede();
+        openDetail(id);
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  MODIFICA SCHEDA (edit panel inside detail)
+// ═══════════════════════════════════════════
+function toggleEdit(schedaId) {
+    const wrap = document.getElementById('edit-panel-wrap');
+    if (wrap.innerHTML) { wrap.innerHTML = ''; return; }
+    const s = allSchede.find(x => x.ID === schedaId);
+    newRicambi = [];
+    newFotos = [];
+    existingFotos = [];
+    removedFotoUrls = [];
+
+    // ── Carica ricambi esistenti dalla scheda ──
+    const existingParts = (s.Ricambi || '').split(' | ').filter(Boolean);
+    _editHadExistingRicambi = existingParts.length > 0;
+    existingParts.forEach(r => {
+        const m = r.match(/^([^×]+)×(\d+)\s*(.*)$/);
+        if (m) {
+            const codice = m[1] === '?' ? null : m[1];
+            const qty = parseInt(m[2]) || 1;
+            const desc = m[3] || '';
+            const part = codice ? partsCache.find(p => p.Codice.toUpperCase() === codice.toUpperCase()) : null;
+            newRicambi.push({
+                codice: codice,
+                descrizione: desc,
+                quantita: qty,
+                tipo: codice ? 'inventario' : 'libero',
+                giacenza: part ? parseFloat(part.Giacenza) || 0 : null,
+                existing: true,
+                originalQty: qty
+            });
+        } else {
+            newRicambi.push({ codice: null, descrizione: r, quantita: 1, tipo: 'libero', giacenza: null, existing: true, originalQty: 1 });
+        }
+    });
+
+    // ── Carica foto esistenti dalla scheda ──
+    const thumbs = (s.FotoThumbs || '').split(' | ').filter(Boolean);
+    const urls = (s.FotoURLs || '').split(' | ').filter(Boolean);
+    for (let i = 0; i < urls.length; i++) {
+        existingFotos.push({ url: urls[i], thumb: thumbs[i] || urls[i] });
+    }
+
+    wrap.innerHTML = `<div class="edit-panel">
+        <h3>✏️ Modifica Scheda</h3>
+        <div class="edit-group"><label>Descrizione Lavoro</label>
+            <textarea id="edit-desc">${esc(s.Descrizione||'')}</textarea>
+            <button class="btn btn-ghost btn-sm" style="margin-top:6px" onclick="saveDesc('${esc(schedaId)}')">💾 Salva Descrizione</button>
+        </div>
+        <div class="edit-group"><label>Aggiungi Ricambi da Inventario</label>
+            <div class="ric-search-wrap"><input type="text" id="edit-ric-search" placeholder="Cerca per codice o descrizione..." oninput="onRicSearch(this.value)" autocomplete="off"><div class="ric-results" id="edit-ric-results"></div></div>
+        </div>
+        <div id="edit-ric-selected"></div>
+        <div class="divider">oppure manualmente</div>
+        <div class="ric-manual-row"><input type="text" id="edit-ric-free" placeholder="es. prodotto non presente in magazzino..." onkeydown="if(event.key==='Enter'){event.preventDefault();addFreeRic()}"><button class="btn btn-ghost btn-sm" onclick="addFreeRic()">+ Aggiungi</button></div>
+
+        ${existingFotos.length ? `<div class="edit-group" style="margin-top:16px"><label>Foto Esistenti (${existingFotos.length}) — clicca ✕ per rimuovere</label>
+            <div id="edit-existing-fotos"></div>
+        </div>` : ''}
+
+        <div class="edit-group" style="margin-top:16px"><label>Aggiungi Nuove Foto</label>
+            <div class="foto-upload-grid" id="edit-foto-preview"></div>
+            <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                <button class="btn btn-ghost btn-sm" onclick="openFotoSheet('edit')">📷 Scegli Foto</button>
+                <span id="edit-foto-count" style="font-size:.75rem;color:var(--text-muted)"></span>
+            </div>
+            <input type="file" id="edit-foto-camera" accept="image/*" capture="environment" style="display:none" onchange="onFotoSelect(event)">
+            <input type="file" id="edit-foto-input" accept="image/*" multiple style="display:none" onchange="onFotoSelect(event)">
+            <input type="file" id="edit-foto-file" multiple style="display:none" onchange="onFotoSelect(event)">
+        </div>
+        <button class="btn btn-primary" style="margin-top:10px" onclick="saveAllEdits('${esc(schedaId)}')">💾 Salva Tutte le Modifiche</button>
+    </div>`;
+    renderRicList();
+    renderExistingFotos();
+}
+
+async function saveDesc(id) {
+    const desc = document.getElementById('edit-desc').value;
+    try {
+        await fetchApi(`/schede/${id}`, { method: 'PATCH', body: { descrizione: desc } });
+        toast('Descrizione aggiornata', 'success');
+        await loadSchede();
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+function onRicSearch(q) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const res = document.getElementById('edit-ric-results');
+        q = q.trim().toLowerCase();
+        if (q.length < 2) { res.classList.remove('show'); return; }
+        const codes = newRicambi.map(r => r.codice);
+        const matches = partsCache.filter(p => ((p.Codice||'').toLowerCase().includes(q)||(p.Descrizione||'').toLowerCase().includes(q)) && !codes.includes(p.Codice)).slice(0, 6);
+        if (!matches.length) { res.innerHTML = '<div class="ric-result" style="cursor:default;color:var(--text-muted)">Nessun risultato</div>'; res.classList.add('show'); return; }
+        res.innerHTML = matches.map(p => {
+            const g = parseFloat(p.Giacenza)||0;
+            const cls = g<=0?'stock-zero':g<(parseInt(p.ScortaMinima)||0)?'stock-low':'stock-ok';
+            return `<div class="ric-result" onclick="selectRic('${esc(p.Codice)}')"><span class="ric-code">${esc(p.Codice)}</span><span class="ric-desc">${esc(p.Descrizione||'')}</span><span class="${cls}">giac:${g}</span></div>`;
+        }).join('');
+        res.classList.add('show');
+    }, 200);
+}
+
+function selectRic(code) {
+    const p = partsCache.find(x => x.Codice === code);
+    if (!p || newRicambi.some(r => r.codice === code)) return;
+    newRicambi.push({ codice: p.Codice, descrizione: p.Descrizione||'', quantita: 1, tipo: 'inventario', giacenza: parseFloat(p.Giacenza)||0 });
+    document.getElementById('edit-ric-search').value = '';
+    document.getElementById('edit-ric-results').classList.remove('show');
+    renderRicList();
+}
+
+function addFreeRic() {
+    const input = document.getElementById('edit-ric-free');
+    const text = input.value.trim();
+    if (!text || newRicambi.some(r => r.descrizione.toLowerCase() === text.toLowerCase())) return;
+    newRicambi.push({ codice: null, descrizione: text, quantita: 1, tipo: 'libero', giacenza: null });
+    input.value = '';
+    renderRicList();
+}
+
+function changeQty(i, d) { newRicambi[i].quantita = Math.max(1, newRicambi[i].quantita + d); }
+function removeRic(i) { newRicambi.splice(i, 1); }
+
+function renderRicList() {
+    const c = document.getElementById('edit-ric-selected');
+    if (!c) return;
+    if (!newRicambi.length) { c.innerHTML = ''; return; }
+    c.innerHTML = newRicambi.map((r, i) => {
+        const inv = r.tipo === 'inventario';
+        const over = inv && r.quantita > r.giacenza;
+        const existTag = r.existing ? '<span style="font-size:.65rem;color:var(--text-muted);margin-left:4px">GIÀ PRESENTE</span>' : '<span style="font-size:.65rem;color:var(--success);margin-left:4px">NUOVO</span>';
+        return `<div class="ric-item" ${over?'style="border-color:var(--danger)"':''}>
+            <div class="ric-item-info"><div class="ric-item-code">${inv?esc(r.codice):'MANUALE'}${over?' <span style="color:var(--danger);font-size:.68rem">⚠ supera giacenza</span>':''}${existTag}</div><div class="ric-item-desc">${esc(r.descrizione)}</div></div>
+            <div class="qty-ctrl"><button onclick="changeQty(${i},-1);renderRicList()">−</button><span>${r.quantita}</span><button onclick="changeQty(${i},+1);renderRicList()">+</button></div>
+            <button class="ric-remove" onclick="removeRic(${i});renderRicList()">✕</button>
+        </div>`;
+    }).join('');
+}
+
+let currentEditId = '';
+function toggleEdit_orig(id) { currentEditId = id; toggleEdit(id); }
+
+// ── Foto: sheet di scelta sorgente (replica l'action sheet iOS su Android/desktop) ──
+const IS_IOS = /iP(hone|ad|od)/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+const FOTO_INPUT_SUFFIX = { camera: 'foto-camera', library: 'foto-input', file: 'foto-file' };
+let _fotoSheetPrefix = 'edit';
+
+function openFotoSheet(prefix) {
+    _fotoSheetPrefix = prefix;
+    // iOS: l'input senza capture mostra già Scatta/Libreria/Sfoglia → nessun menu custom
+    if (IS_IOS) { document.getElementById(`${prefix}-foto-input`).click(); return; }
+    const ov = document.getElementById('foto-sheet');
+    ov.classList.add('show');
+    const first = ov.querySelector('.sheet-btn');
+    if (first) first.focus();
+}
+function closeFotoSheet() { document.getElementById('foto-sheet').classList.remove('show'); }
+function pickFotoSource(src) {
+    closeFotoSheet();
+    // .click() resta dentro il gesto utente del tap sulla voce → il picker si apre
+    const el = document.getElementById(`${_fotoSheetPrefix}-${FOTO_INPUT_SUFFIX[src]}`);
+    if (el) el.click();
+}
+document.addEventListener('keydown', e => { if (e.key === 'Escape') closeFotoSheet(); });
+
+// Foto
+function onFotoSelect(e) {
+    // Filtro tipo: l'input "Scegli file" non ha accept, quindi scarta i non-immagine (type vuoto = HEIC/sconosciuto, lasciato passare)
+    const files = [...e.target.files].filter(f => !f.type || f.type.startsWith('image/'));
+    const max = 10 - newFotos.length;
+    files.slice(0, max).forEach(f => {
+        compressImg(f, 1200, 0.8).then(c => {
+            newFotos.push({ base64: c.base64, preview: c.dataUrl, mimeType: 'image/jpeg', label: guessLabel(f.name) });
+            renderFotoPreview();
+        }).catch(() => toast(`File non valido: ${f.name}`, 'error'));
+    });
+    e.target.value = '';
+}
+function removeFoto(i) { newFotos.splice(i, 1); renderFotoPreview(); }
+function renderFotoPreview() {
+    const c = document.getElementById('edit-foto-preview');
+    const cnt = document.getElementById('edit-foto-count');
+    c.innerHTML = newFotos.map((f, i) => `<div class="foto-preview-wrap"><img class="foto-preview" src="${f.preview}"><button class="foto-preview-rm" onclick="removeFoto(${i})">✕</button></div>`).join('');
+    cnt.textContent = newFotos.length ? `${newFotos.length} nuove foto` : '';
+}
+
+// ── Foto esistenti nella scheda (con possibilità di rimozione) ──
+function renderExistingFotos() {
+    const c = document.getElementById('edit-existing-fotos');
+    if (!c) return;
+    const active = existingFotos.filter(f => !removedFotoUrls.includes(f.url));
+    const removed = existingFotos.filter(f => removedFotoUrls.includes(f.url));
+
+    let html = '';
+    if (active.length) {
+        html += '<div class="foto-upload-grid">';
+        active.forEach((f, _) => {
+            const idx = existingFotos.indexOf(f);
+            html += `<div class="foto-preview-wrap" style="position:relative">
+                <img class="foto-preview" src="${esc(f.thumb)}" style="border-color:var(--border)" onerror="this.style.display='none'">
+                <button class="foto-preview-rm" onclick="markFotoForRemoval(${idx})" title="Rimuovi foto">✕</button>
+            </div>`;
+        });
+        html += '</div>';
+    }
+    if (removed.length) {
+        html += `<div style="margin-top:8px"><span style="font-size:.72rem;color:var(--danger);font-weight:600">🗑️ ${removed.length} foto da eliminare</span>`;
+        html += '<div class="foto-upload-grid" style="margin-top:4px;opacity:.45">';
+        removed.forEach((f, _) => {
+            const idx = existingFotos.indexOf(f);
+            html += `<div class="foto-preview-wrap" style="position:relative">
+                <img class="foto-preview" src="${esc(f.thumb)}" style="border-color:var(--danger)" onerror="this.style.display='none'">
+                <button class="foto-preview-rm" style="background:var(--success)" onclick="unmarkFotoForRemoval(${idx})" title="Ripristina foto">↩</button>
+            </div>`;
+        });
+        html += '</div></div>';
+    }
+    if (!active.length && !removed.length) {
+        html = '<span style="font-size:.78rem;color:var(--text-muted)">Nessuna foto allegata</span>';
+    }
+    c.innerHTML = html;
+}
+
+function markFotoForRemoval(idx) {
+    const foto = existingFotos[idx];
+    if (foto && !removedFotoUrls.includes(foto.url)) {
+        removedFotoUrls.push(foto.url);
+        renderExistingFotos();
+    }
+}
+
+function unmarkFotoForRemoval(idx) {
+    const foto = existingFotos[idx];
+    if (foto) {
+        removedFotoUrls = removedFotoUrls.filter(u => u !== foto.url);
+        renderExistingFotos();
+    }
+}
+function compressImg(file, maxDim, quality) {
+    return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = e => {
+            const img = new Image();
+            img.onload = () => {
+                let w = img.width, h = img.height;
+                if (w > maxDim || h > maxDim) { const r = Math.min(maxDim/w, maxDim/h); w = Math.round(w*r); h = Math.round(h*r); }
+                const cv = document.createElement('canvas'); cv.width = w; cv.height = h;
+                cv.getContext('2d').drawImage(img, 0, 0, w, h);
+                const dataUrl = cv.toDataURL('image/jpeg', quality);
+                resolve({ dataUrl, base64: dataUrl.split(',')[1] });
+            };
+            img.onerror = reject;
+            img.src = e.target.result;
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+    });
+}
+function guessLabel(fn) {
+    const l = fn.toLowerCase();
+    const m = { filtr:'filtro',cingh:'cinghia',olio:'olio',girant:'girante',anod:'anodo',guarniz:'guarnizione',candi:'candela',pompa:'pompa',valvol:'valvola',termosta:'termostato' };
+    for (const [k, v] of Object.entries(m)) if (l.includes(k)) return v;
+    return 'ricambio';
+}
+
+// Salva tutte le modifiche con una PATCH
+async function saveAllEdits(id) {
+    const body = {};
+    const desc = document.getElementById('edit-desc');
+    if (desc) body.descrizione = desc.value;
+
+    // Invia la lista completa (esistenti + nuovi) per consentire rimozioni e ripristino stock.
+    // CRITICO: inviare SEMPRE se la scheda aveva ricambi, anche se ora la lista è vuota
+    // (l'utente potrebbe aver rimosso tutti gli articoli → il server deve ripristinare lo stock)
+    if (_editHadExistingRicambi || newRicambi.length) {
+        body.ricambiCompleti = newRicambi.map(r => ({
+            codice: r.codice, descrizione: r.descrizione, quantita: r.quantita,
+            existing: !!r.existing, originalQty: r.originalQty || 0
+        }));
+    }
+
+    if (newFotos.length) body.foto = newFotos.map(f => ({ base64Data: f.base64, mimeType: f.mimeType, label: f.label }));
+
+    // Foto esistenti da eliminare
+    if (removedFotoUrls.length) {
+        body.fotoRimosse = removedFotoUrls.map(url => ({ url }));
+    }
+
+    try {
+        const res = await fetchApi(`/schede/${id}`, { method: 'PATCH', body });
+        const msgs = [];
+        if (body.descrizione !== undefined) msgs.push('descrizione');
+        if (body.ricambiCompleti) {
+            const okStock = res.stockResults ? res.stockResults.filter(s => s.status === 'ok').length : 0;
+            const restored = res.stockRestored ? res.stockRestored.filter(s => s.status === 'ok').length : 0;
+            const parts = [];
+            if (okStock) parts.push(`${okStock} scaricati`);
+            if (restored) parts.push(`${restored} ripristinati`);
+            msgs.push(`ricambi aggiornati${parts.length ? ' (' + parts.join(', ') + ')' : ''}`);
+        }
+        if (body.foto) msgs.push(`${res.fotoCaricate||newFotos.length} foto aggiunte`);
+        if (body.fotoRimosse) msgs.push(`${res.fotoEliminate||removedFotoUrls.length} foto eliminate`);
+        toast(`Salvato: ${msgs.join(', ')}`, 'success');
+        newRicambi = []; newFotos = []; existingFotos = []; removedFotoUrls = []; _editHadExistingRicambi = false;
+        await loadSchede();
+        await loadPartsCache();
+        openDetail(id);
+    } catch (e) { toast(e.message, 'error'); }
+}
+
+// ═══════════════════════════════════════════
+//  CREA NUOVA SCHEDA
+// ═══════════════════════════════════════════
+function initCreateForm() {
+    newRicambi = []; newFotos = [];
+    const c = document.getElementById('create-form');
+    c.innerHTML = `
+        <div id="create-main">
+            <div class="edit-group"><label>Nome Barca *</label><div class="ric-search-wrap"><input type="text" id="c-barca" placeholder="es. Libeccio III" autocomplete="off" oninput="onBarcaSearch(this.value)"><div class="ric-results" id="c-barca-results"></div></div></div>
+            <div class="edit-group"><label>Responsabile Lavoro</label><input type="text" id="c-meccanico" placeholder="es. Marco Rossi"></div>
+            <div class="edit-group"><label>Descrizione Lavoro</label><textarea id="c-desc" placeholder="es. Tagliando motore 100 ore"></textarea></div>
+            <div class="form-section-hdr">⚙️ Ricambi</div>
+            <div class="edit-group"><label>Ricambi da Inventario</label>
+                <div class="ric-search-wrap"><input type="text" id="c-ric-search" placeholder="Cerca per codice o descrizione..." oninput="onCreateRicSearch(this.value)" autocomplete="off"><div class="ric-results" id="c-ric-results"></div></div>
+            </div>
+            <div id="c-ric-selected"></div>
+            <div class="divider">oppure manualmente</div>
+            <div class="ric-manual-row"><input type="text" id="c-ric-free" placeholder="es. prodotto non presente in magazzino..." onkeydown="if(event.key==='Enter'){event.preventDefault();addCreateFreeRic()}"><button class="btn btn-ghost btn-sm" onclick="addCreateFreeRic()">+ Aggiungi</button></div>
+            <div class="form-section-hdr">📷 Foto</div>
+            <div class="edit-group"><label>Foto Ricambi</label>
+                <div class="foto-upload-grid" id="c-foto-preview"></div>
+                <div style="display:flex;gap:8px;align-items:center;margin-top:6px">
+                    <button class="btn btn-ghost btn-sm" onclick="document.getElementById('c-foto-input').click()">📷 Aggiungi Foto</button>
+                    <span id="c-foto-count" style="font-size:.75rem;color:var(--text-muted)"></span>
+                </div>
+                <input type="file" id="c-foto-input" accept="image/*" capture="environment" multiple style="display:none" onchange="onCreateFotoSelect(event)">
+            </div>
+            <div class="progress" id="c-progress"><div class="progress-fill" id="c-progress-fill"></div></div>
+            <button class="btn btn-primary" style="width:100%;margin-top:12px" id="c-submit" onclick="submitNewScheda()">✅ Invia Scheda Lavoro</button>
+        </div>
+        <div id="create-success" class="success-screen" style="display:none">
+            <div class="success-icon">✅</div>
+            <h2>Scheda Creata!</h2>
+            <p id="c-success-detail" style="color:var(--text-dim);margin:8px 0"></p>
+            <button class="btn btn-primary" style="margin-top:20px" onclick="showView('create')">📋 Nuova Scheda</button>
+            <button class="btn btn-back" style="margin-top:8px" onclick="showView('list')"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg> Torna alla lista</button>
+        </div>
+    `;
+}
+
+// Autocomplete barche
+let barcheCache = [];
+async function loadBarcheCache() { try { barcheCache = await fetchApi('/barche'); } catch(_) {} }
+loadBarcheCache();
+
+function onBarcaSearch(q) {
+    const res = document.getElementById('c-barca-results');
+    q = q.trim().toLowerCase();
+    if (q.length < 1) { res.classList.remove('show'); return; }
+    const m = barcheCache.filter(b => b.toLowerCase().includes(q));
+    if (!m.length) { res.classList.remove('show'); return; }
+    res.innerHTML = m.map(b => `<div class="ric-result" onclick="document.getElementById('c-barca').value='${esc(b)}';document.getElementById('c-barca-results').classList.remove('show')">${esc(b)}</div>`).join('');
+    res.classList.add('show');
+}
+
+// Ricambi search for create (reuses same newRicambi state)
+function onCreateRicSearch(q) {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => {
+        const res = document.getElementById('c-ric-results');
+        q = q.trim().toLowerCase();
+        if (q.length < 2) { res.classList.remove('show'); return; }
+        const codes = newRicambi.map(r => r.codice);
+        const matches = partsCache.filter(p => ((p.Codice||'').toLowerCase().includes(q)||(p.Descrizione||'').toLowerCase().includes(q)) && !codes.includes(p.Codice)).slice(0, 6);
+        if (!matches.length) { res.innerHTML = '<div class="ric-result" style="cursor:default;color:var(--text-muted)">Nessun risultato</div>'; res.classList.add('show'); return; }
+        res.innerHTML = matches.map(p => {
+            const g = parseFloat(p.Giacenza)||0;
+            const cls = g<=0?'stock-zero':g<(parseInt(p.ScortaMinima)||0)?'stock-low':'stock-ok';
+            return `<div class="ric-result" onclick="selectCreateRic('${esc(p.Codice)}')"><span class="ric-code">${esc(p.Codice)}</span><span class="ric-desc">${esc(p.Descrizione||'')}</span><span class="${cls}">giac:${g}</span></div>`;
+        }).join('');
+        res.classList.add('show');
+    }, 200);
+}
+function selectCreateRic(code) {
+    const p = partsCache.find(x => x.Codice === code);
+    if (!p || newRicambi.some(r => r.codice === code)) return;
+    newRicambi.push({ codice: p.Codice, descrizione: p.Descrizione||'', quantita: 1, tipo: 'inventario', giacenza: parseFloat(p.Giacenza)||0 });
+    document.getElementById('c-ric-search').value = '';
+    document.getElementById('c-ric-results').classList.remove('show');
+    renderCreateRicList();
+}
+function addCreateFreeRic() {
+    const input = document.getElementById('c-ric-free');
+    const text = input.value.trim();
+    if (!text) return;
+    newRicambi.push({ codice: null, descrizione: text, quantita: 1, tipo: 'libero', giacenza: null });
+    input.value = '';
+    renderCreateRicList();
+}
+function renderCreateRicList() {
+    const c = document.getElementById('c-ric-selected');
+    if (!newRicambi.length) { c.innerHTML = ''; return; }
+    c.innerHTML = newRicambi.map((r, i) => {
+        const inv = r.tipo === 'inventario';
+        const over = inv && r.quantita > r.giacenza;
+        return `<div class="ric-item" ${over?'style="border-color:var(--danger)"':''}>
+            <div class="ric-item-info"><div class="ric-item-code">${inv?esc(r.codice):'MANUALE'}${over?' <span style="color:var(--danger);font-size:.68rem">⚠</span>':''}</div><div class="ric-item-desc">${esc(r.descrizione)}</div></div>
+            <div class="qty-ctrl"><button onclick="changeQty(${i},-1);renderCreateRicList()">−</button><span>${r.quantita}</span><button onclick="changeQty(${i},+1);renderCreateRicList()">+</button></div>
+            <button class="ric-remove" onclick="removeRic(${i});renderCreateRicList()">✕</button>
+        </div>`;
+    }).join('');
+}
+window.renderRicambiSelezionati = renderCreateRicList;
+
+// Foto for create
+function onCreateFotoSelect(e) {
+    const files = [...e.target.files];
+    files.slice(0, 10 - newFotos.length).forEach(f => {
+        compressImg(f, 1200, 0.8).then(c => {
+            newFotos.push({ base64: c.base64, preview: c.dataUrl, mimeType: 'image/jpeg', label: guessLabel(f.name) });
+            renderCreateFotos();
+        });
+    });
+    e.target.value = '';
+}
+function renderCreateFotos() {
+    const c = document.getElementById('c-foto-preview');
+    const cnt = document.getElementById('c-foto-count');
+    c.innerHTML = newFotos.map((f, i) => `<div class="foto-preview-wrap"><img class="foto-preview" src="${f.preview}"><button class="foto-preview-rm" onclick="newFotos.splice(${i},1);renderCreateFotos()">✕</button></div>`).join('');
+    cnt.textContent = newFotos.length ? `${newFotos.length} foto` : '';
+}
+
+async function submitNewScheda() {
+    const barca = document.getElementById('c-barca').value.trim();
+    if (!barca) { toast('Inserisci il nome della barca', 'error'); return; }
+    const btn = document.getElementById('c-submit');
+    btn.disabled = true; btn.textContent = '⏳ Invio...';
+    const bar = document.getElementById('c-progress');
+    const fill = document.getElementById('c-progress-fill');
+    bar.classList.add('active');
+    let p = 0;
+    const timer = setInterval(() => { p = Math.min(p+5,90); fill.style.width = p+'%'; }, 200);
+    try {
+        const res = await fetchApi('/schede', { method: 'POST', body: {
+            barca,
+            meccanico: document.getElementById('c-meccanico').value.trim() || 'Non specificato',
+            descrizione: document.getElementById('c-desc').value.trim(),
+            ricambi: newRicambi.map(r => ({ codice: r.codice, descrizione: r.descrizione, quantita: r.quantita })),
+            foto: newFotos.map(f => ({ base64Data: f.base64, mimeType: f.mimeType, label: f.label })),
+        }});
+        clearInterval(timer); fill.style.width = '100%';
+        const ok = res.stockResults ? res.stockResults.filter(s => s.status === 'ok').length : 0;
+        document.getElementById('create-main').style.display = 'none';
+        const suc = document.getElementById('create-success');
+        suc.style.display = 'block';
+        document.getElementById('c-success-detail').textContent = `${barca} — ${newRicambi.length} ricambi (${ok} scaricati), ${newFotos.length} foto`;
+        newRicambi = []; newFotos = [];
+        await loadPartsCache();
+    } catch (e) {
+        clearInterval(timer);
+        toast(e.message, 'error');
+        btn.disabled = false; btn.textContent = '✅ Invia Scheda Lavoro';
+    }
+    setTimeout(() => { bar.classList.remove('active'); fill.style.width = '0'; }, 1000);
+}
+
+// ═══════════════════════════════════════════
+//  HELPERS
+// ═══════════════════════════════════════════
+function esc(s) { const d = document.createElement('div'); d.textContent = s; return d.innerHTML; }
+function toast(msg, type='success') { const t = document.getElementById('toast'); t.textContent = msg; t.className = `toast show ${type}`; setTimeout(() => t.classList.remove('show'), 3500); }
+
+// Demo countdown
+(async function() {
+    try {
+        const h = await fetchApi('/health');
+        if (h.resetIn === undefined) return;
+        let remaining = Math.max(0, Math.floor(h.resetIn));
+        const el = document.getElementById('demo-countdown-mec');
+        if (!el) return;
+        function tick() {
+            const m = Math.floor(remaining / 60);
+            const s = remaining % 60;
+            el.textContent = m + ':' + String(s).padStart(2,'0');
+            if (remaining <= 0) location.reload();
+            remaining--;
+        }
+        tick();
+        setInterval(tick, 1000);
+    } catch(_) {}
+})();
+</script>
+</body>
+</html>

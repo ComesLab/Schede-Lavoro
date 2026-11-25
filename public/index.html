@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Magazzino — Marina Rodi Garganico</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="app">
+    <!-- Header -->
+    <header class="header">
+        <div class="header-left">
+            <img src="/logoporto.jpg" class="logo" alt="Marina Rodi Garganico">
+            <div>
+                <h1>Magazzino Ricambi</h1>
+                <p class="subtitle">Marina Rodi Garganico — <span id="sync-status" class="badge badge-dim">Connessione...</span></p>
+            </div>
+        </div>
+        <div class="header-actions">
+            <a href="/meccanico" class="btn btn-ghost" title="Schede Lavorazione">🔧 Schede Lavorazione</a>
+            <button class="btn btn-primary" onclick="openNewPartModal()">+ Nuovo Ricambio</button>
+        </div>
+    </header>
+
+    <!-- Demo Banner -->
+    <div id="demo-banner" style="background:linear-gradient(135deg,#1e3a5f,#3b82f6);padding:12px 20px;border-radius:8px;margin-bottom:16px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px">
+        <div style="display:flex;align-items:center;gap:10px">
+            <span style="font-size:1.2rem">🧪</span>
+            <div>
+                <div style="font-weight:700;font-size:.92rem;color:#fff">DEMO MODE</div>
+                <div style="font-size:.75rem;color:#93c5fd">Tutti i dati sono fittizi e verranno ripristinati automaticamente</div>
+            </div>
+        </div>
+        <div style="background:rgba(0,0,0,.3);padding:6px 14px;border-radius:6px;font-family:'JetBrains Mono',monospace;font-size:.88rem;color:#93c5fd">
+            Reset tra <span id="demo-countdown" style="color:#fff;font-weight:700">--:--</span>
+        </div>
+    </div>
+
+    <!-- KPI Cards -->
+    <section class="kpi-row" id="kpi-row">
+        <div class="kpi-card">
+            <span class="kpi-label">Articoli in Stock</span>
+            <span class="kpi-value" id="kpi-instock">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Quantità Totale</span>
+            <span class="kpi-value" id="kpi-qty">—</span>
+        </div>
+        <div class="kpi-card">
+            <span class="kpi-label">Valore Vendita</span>
+            <span class="kpi-value" id="kpi-val">—</span>
+        </div>
+        <div class="kpi-card kpi-danger" ondblclick="showLowStock()">
+            <span class="kpi-label">⚠ Sotto Scorta</span>
+            <span class="kpi-value" id="kpi-low">—</span>
+            <span class="kpi-hint">doppio clic per dettagli</span>
+        </div>
+    </section>
+
+    <!-- Search + Tabs -->
+    <section class="toolbar">
+        <div class="search-box">
+            <span class="search-icon">⌕</span>
+            <input type="text" id="search-input" placeholder="Cerca per codice o descrizione..." oninput="onSearch(this.value)">
+        </div>
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('parts', this)">📦 Ricambi</button>
+            <button class="tab" onclick="switchTab('lowstock', this)">⚠ SottoScorta</button>
+            <button class="tab" onclick="switchTab('movements', this)">📋 Movimenti</button>
+        </div>
+    </section>
+
+    <!-- Table -->
+    <section class="table-container" id="table-container">
+        <table id="data-table">
+            <thead id="table-head"></thead>
+            <tbody id="table-body"></tbody>
+        </table>
+        <div class="table-empty" id="table-empty" style="display:none">
+            <span class="empty-icon">📦</span>
+            <p>Nessun dato trovato</p>
+        </div>
+    </section>
+
+    <!-- Status bar -->
+    <footer class="status-bar">
+        <span id="status-text">Pronto</span>
+        <span id="row-count"></span>
+    </footer>
+</div>
+
+<!-- Modal: Dettaglio/Modifica Articolo -->
+<dialog id="part-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="modal-title">Dettaglio Articolo</h2>
+            <button class="btn-close" onclick="closeModal()">✕</button>
+        </div>
+        <form id="part-form" onsubmit="savePart(event)">
+            <div class="form-grid">
+                <div class="form-group">
+                    <label>Codice</label>
+                    <input name="Codice" id="f-code" required>
+                </div>
+                <div class="form-group span-3">
+                    <label>Descrizione</label>
+                    <input name="Descrizione" id="f-desc" required>
+                </div>
+                <div class="form-group">
+                    <label>UM</label>
+                    <input name="UM" id="f-um" value="pezzo">
+                </div>
+                <div class="form-group">
+                    <label>Prezzo Vendita</label>
+                    <input name="PrezzoVendita" id="f-pv" type="number" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Prezzo Acquisto</label>
+                    <input name="PrezzoAcquisto" id="f-pa" type="number" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Codice IVA</label>
+                    <input name="CodiceIVA" id="f-iva" value="9">
+                </div>
+                <div class="form-group">
+                    <label>Giacenza</label>
+                    <input name="Giacenza" id="f-giac" type="number" step="0.01" value="0">
+                </div>
+                <div class="form-group">
+                    <label>Scorta Minima</label>
+                    <input name="ScortaMinima" id="f-sm" type="number" value="0" min="0">
+                </div>
+                <div class="form-group">
+                    <label>Nota rettifica</label>
+                    <input name="_note" id="f-note" placeholder="Opzionale">
+                </div>
+                <div class="form-group">
+                    <label>Settore</label>
+                    <input name="Settore" id="f-settore">
+                </div>
+                <div class="form-group">
+                    <label>Scaffale</label>
+                    <input name="Scaffale" id="f-scaffale">
+                </div>
+                <div class="form-group">
+                    <label>Ripiano</label>
+                    <input name="Ripiano" id="f-ripiano">
+                </div>
+                <div class="form-group">
+                    <label>Posizione</label>
+                    <input name="Posizione" id="f-posizione">
+                </div>
+                <!-- ★ BARCODE con bottone Scanner ★ -->
+                <div class="form-group">
+                    <label>Barcode</label>
+                    <div class="barcode-input-group">
+                        <input name="Barcode" id="f-barcode">
+                        <button type="button" class="barcode-scan-trigger" onclick="window.openBarcodeScanner('f-barcode')" title="Scansiona codice a barre">
+                            📷 Scan
+                        </button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" id="btn-delete" onclick="deletePart()" style="display:none">Elimina</button>
+                <div class="footer-right">
+                    <button type="button" class="btn btn-ghost" onclick="closeModal()">Annulla</button>
+                    <button type="submit" class="btn btn-primary">Salva</button>
+                </div>
+            </div>
+        </form>
+    </div>
+</dialog>
+
+<!-- Modal: Sotto Scorta -->
+<dialog id="lowstock-modal">
+    <div class="modal-content modal-wide">
+        <div class="modal-header">
+            <h2>⚠ Articoli Sotto Scorta</h2>
+            <button class="btn-close" onclick="document.getElementById('lowstock-modal').close()">✕</button>
+        </div>
+        <div id="lowstock-content"></div>
+    </div>
+</dialog>
+
+<!-- ═══════════════════════════════════════════════════════
+     BARCODE SCANNER — Overlay fullscreen
+     BarcodeDetector API nativa (zero dipendenze)
+     ═══════════════════════════════════════════════════════ -->
+<div id="scannerOverlay" class="scanner-overlay">
+    <!-- Header -->
+    <div class="scanner-header">
+        <h3>📷 Scansione Barcode</h3>
+        <button class="scanner-close-btn" id="scannerCloseBtn" title="Chiudi">✕</button>
+    </div>
+
+    <!-- Errore compatibilità (solo se nativo + polyfill falliscono entrambi) -->
+    <div class="scanner-error" id="scannerError">
+        <div class="scanner-error-icon">🚫</div>
+        <h4>Scansione non disponibile</h4>
+        <p id="scannerErrorMsg">
+            Impossibile inizializzare lo scanner. Verifica la connessione
+            internet oppure usa Chrome su Android dove la scansione è nativa.
+        </p>
+        <div class="scanner-browsers">
+            <span>✅ Chrome (tutti)</span>
+            <span>✅ Edge</span>
+            <span>✅ Firefox</span>
+            <span>✅ Safari 17+</span>
+        </div>
+    </div>
+
+    <!-- Area video + mirino -->
+    <div class="scanner-video-area" id="scannerVideoArea" style="display:none">
+        <video id="scannerVideo" autoplay playsinline muted></video>
+        <div class="scanner-viewfinder">
+            <div class="scanner-frame" id="scannerFrame">
+                <div class="scanner-corner tl"></div>
+                <div class="scanner-corner tr"></div>
+                <div class="scanner-corner bl"></div>
+                <div class="scanner-corner br"></div>
+                <div class="scanner-line" id="scannerLine"></div>
+            </div>
+        </div>
+        <div class="scanner-hint">Inquadra il codice a barre nel riquadro</div>
+    </div>
+
+    <!-- Footer: stato + risultato -->
+    <div class="scanner-footer">
+        <div class="scanner-scanning-status" id="scannerStatus">
+            <div class="dot-pulse"><span></span><span></span><span></span></div>
+            Scansione barcode in corso…
+        </div>
+        <!-- Bottone OCR: cattura frame → Gemini estrae part number -->
+        <button class="scanner-btn scanner-btn-ocr" id="scannerOcrBtn" title="Leggi codice stampato dalla foto">
+            📝 Leggi Part Number
+        </button>
+        <!-- Stato OCR in corso -->
+        <div class="scanner-ocr-status" id="scannerOcrStatus">
+            <div class="dot-pulse"><span></span><span></span><span></span></div>
+            Gemini sta leggendo il testo…
+        </div>
+        <div class="scanner-result" id="scannerResult">
+            <div class="scanner-result-code">
+                <span class="code-icon" id="scannerCodeIcon">✅</span>
+                <span class="code-value" id="scannerCodeValue">—</span>
+                <span class="code-format" id="scannerCodeFormat">—</span>
+            </div>
+            <div class="scanner-match" id="scannerMatch">
+                <span class="scanner-match-title">📦 Trovato in magazzino</span>
+                <span class="scanner-match-desc" id="scannerMatchDesc"></span>
+                <span class="scanner-match-stock" id="scannerMatchStock"></span>
+            </div>
+            <div class="scanner-no-match" id="scannerNoMatch">
+                ⚠ Codice non presente in magazzino — verrà inserito come nuovo.
+            </div>
+            <!-- Lista part number multipli (OCR può trovarne più d'uno) -->
+            <div class="scanner-ocr-list" id="scannerOcrList"></div>
+            <div class="scanner-actions">
+                <button class="scanner-btn scanner-btn-confirm" id="scannerConfirmBtn">✓ Usa codice</button>
+                <button class="scanner-btn scanner-btn-retry" id="scannerRetryBtn">↻ Scansiona ancora</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
