@@ -13,10 +13,31 @@ const cors = require('cors');
 const path = require('path');
 const os = require('os');
 
+const https = require('https');
 const { getInitialData } = require('./mock-data');
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+
+// ════════════════════════════════════════════════
+//  TELEGRAM NOTIFICATION
+// ════════════════════════════════════════════════
+
+const TG_BOT_TOKEN = process.env.TELEGRAM_BOT_TOKEN;
+const TG_CHAT_ID = process.env.TELEGRAM_CHAT_ID;
+
+function sendTelegramNotify(text) {
+    if (!TG_BOT_TOKEN || !TG_CHAT_ID) return;
+    const data = JSON.stringify({ chat_id: TG_CHAT_ID, text, parse_mode: 'HTML' });
+    const req = https.request({
+        hostname: 'api.telegram.org',
+        path: `/bot${TG_BOT_TOKEN}/sendMessage`,
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Content-Length': Buffer.byteLength(data) }
+    });
+    req.on('error', () => {});
+    req.end(data);
+}
 
 app.use(cors({ origin: true, credentials: true }));
 app.use(express.json({ limit: '20mb' }));
@@ -49,6 +70,20 @@ function secondsUntilReset() {
 app.use((req, res, next) => {
     checkReset();
     res.set('X-Demo-Reset-In', String(secondsUntilReset()));
+    next();
+});
+
+// Middleware: Telegram notification su pagine monitorate
+const MONITORED_PAGES = ['/', '/index.html', '/meccanico', '/meccanico.html'];
+app.use((req, res, next) => {
+    if (req.method === 'GET' && MONITORED_PAGES.includes(req.path.toLowerCase())) {
+        const ip = req.headers['x-forwarded-for']?.split(',')[0]?.trim() || req.ip || 'N/A';
+        const ua = req.headers['user-agent'] || 'N/A';
+        const page = req.path === '/' || req.path === '/index.html' ? '📦 Magazzino Ricambi' : '🔧 Schede Lavoro';
+        const ts = new Date().toLocaleString('it-IT', { timeZone: 'Europe/Rome' });
+        const msg = `🔔 <b>Accesso Demo Marina</b>\n📍 IP: <code>${ip}</code>\n📄 Pagina: ${page}\n🕐 ${ts}\n📱 ${ua.substring(0, 100)}`;
+        sendTelegramNotify(msg);
+    }
     next();
 });
 
