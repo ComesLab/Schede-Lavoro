@@ -2,7 +2,7 @@
 
 Demo mockup dei moduli **Magazzino Ricambi** e **Schede di Lavorazione Operatore**.
 
-> Dati fittizi in memoria, reset automatico ogni 10 minuti.
+ Dati fittizi in memoria, reset automatico ogni 10 minuti.
 
 **Live:** [schede-lavoro.vercel.app](https://schede-lavoro.vercel.app/)
 
